@@ -125,6 +125,7 @@ typedef struct
     unsigned long majflt;       /**< major page faults (# of pages) */
     unsigned long vsize;        /**< virtual memory size (bytes) */
     long rss;                   /**< resident set size (pages) */
+    long data;                  /**< data size (pages) */
 #ifdef __linux__
     unsigned long start_code;   /**< start address of the code segment */
     unsigned long end_code;     /**< end address of the code segment */

@@ -171,6 +171,8 @@ typedef struct
     {
         res_t vsize;            /**< virtual memory usage (bytes) */
         res_t vsize_peak;       /**< virtual memory peak usage (bytes) */
+        res_t data;             /**< data size (bytes) */
+        res_t data_peak;        /**< data peak size (bytes) */
         res_t rss;              /**< resident set size (bytes) */
         res_t rss_peak;         /**< resident set peak size (bytes) */
         res_t minflt;           /**< minor page faults (# of pages) */

@@ -792,6 +792,7 @@ __sandbox_stat_update(sandbox_t * psbox, const proc_t * pproc)
     
     MEM_UPDATE(psbox->stat.mem_info.vsize, pproc->vsize);
     MEM_UPDATE(psbox->stat.mem_info.rss, pproc->rss * getpagesize());
+    MEM_UPDATE(psbox->stat.mem_info.data, pproc->data * getpagesize());
     psbox->stat.mem_info.minflt = pproc->minflt;
     psbox->stat.mem_info.majflt = pproc->majflt;
     

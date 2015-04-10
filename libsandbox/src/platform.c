@@ -271,6 +271,52 @@ proc_probe(pid_t pid, int opt, proc_t * const pproc)
     TS_UPDATE_CLK(&pproc->utime, tm.tms_utime);
     TS_UPDATE_CLK(&pproc->stime, tm.tms_stime);
     
+    sprintf(buffer, PROCFS "/%d/statm", pid);
+
+    fd = open(buffer, O_RDONLY);
+    if (fd < 0) {
+        WARN("procfs statm missing or unaccessable");
+        return 0;
+    }
+
+    len = read(fd, buffer, sizeof(buffer) - 1);
+    errnum = errno;
+
+    close(fd);
+
+    if (len < 0) {
+        errno = errnum;
+        WARN("failed to grab statm from procfs");
+        return 0;
+    }
+
+    buffer[len] = '\0';
+    offset = 0;
+    token = buffer;
+
+    do {
+        errno = 0;
+        switch (offset++)
+        {
+        case  0:                /* size */
+        case  1:                /* resident */
+        case  2:                /* share */
+        case  3:                /* text */
+        case  4:                /* lib */
+            break;
+        case  5:                /* data */
+            pproc->data = strtol(token, NULL, 10);
+            break;
+        case  6:                /* dt */
+        default:
+            break;
+        }
+        if (errno != 0) {
+            WARN("failed to parse stats from procfs");
+            return 0;
+        }
+    } while (strsep(&token, " ") != NULL);
+
     DBUG("proc.pid                    % 10d", pproc->pid);
     DBUG("proc.ppid                   % 10d", pproc->ppid);
     DBUG("proc.state                           %c", pproc->state);
@@ -281,7 +327,7 @@ proc_probe(pid_t pid, int opt, proc_t * const pproc)
     DBUG("proc.majflt                 %010lu", pproc->majflt);
     DBUG("proc.vsize                  %010lu", pproc->vsize);
     DBUG("proc.rss                    % 10ld", pproc->rss);
-    
+    DBUG("proc.data                   % 10ld", pproc->data);
 #else
 #warning "proc_probe() requires procfs"
 #endif /* HAVE_PROCFS */
